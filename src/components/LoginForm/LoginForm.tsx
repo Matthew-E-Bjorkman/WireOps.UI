@@ -1,16 +1,22 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { logIn } from "../../store/sessionSlice.tsx";
+import "../../style/LoginForm.css";
 
-interface LoginFormProps {
-  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export default function LoginForm({ setLoggedIn }: LoginFormProps) {
+export default function LoginForm() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const isLoggedIn = useSelector((state: any) => state.session.loggedIn);
+  const dispatch = useDispatch();
 
   function handleSubmit(submitEvent) {
     submitEvent.preventDefault();
-    setLoggedIn(true);
+    dispatch(logIn());
+  }
+
+  if (isLoggedIn) {
+    return <Navigate to="/products" />;
   }
 
   return (
