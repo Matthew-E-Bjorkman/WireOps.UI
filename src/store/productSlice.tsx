@@ -12,7 +12,7 @@ export const productApi = createApi({
       query: () => "",
     }),
     getProductById: builder.query<Product, string>({
-      query: (id) => `?id=${id}`,
+      query: (id) => `/${id}`,
     }),
     addProduct: builder.mutation<Product, Partial<Product>>({
       query: (body) => ({

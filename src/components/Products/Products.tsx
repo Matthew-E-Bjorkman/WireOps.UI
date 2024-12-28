@@ -6,9 +6,7 @@ import {
 } from "../../store/productSlice.tsx";
 
 export default function Products() {
-  const { data, error, isLoading } = useGetProductByIdQuery(
-    "f90d2cb5-55db-466e-9c18-5ca4a4903279"
-  );
+  const { data, error, isLoading } = useGetProductListQuery();
 
   console.log(data, error, isLoading);
 
@@ -28,10 +26,13 @@ export default function Products() {
         </div>
       )}
       {data && (
-        <ul>
-          <li>{data.id}</li>
-          <li>{data.name}</li>
-        </ul>
+        <div>
+          {data.map((product) => (
+            <div key={product.id}>
+              <h2>{product.name}</h2>
+            </div>
+          ))}
+        </div>
       )}
     </>
   );
