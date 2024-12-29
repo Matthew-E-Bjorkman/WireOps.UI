@@ -87,7 +87,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               />
               <Form.Label>Description</Form.Label>
               <Form.Control
-                type="textarea"
+                as="textarea"
+                rows={3}
                 placeholder="Enter product description"
                 value={product.description}
                 onChange={(e) =>
