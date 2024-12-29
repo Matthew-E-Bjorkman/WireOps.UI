@@ -1,5 +1,4 @@
 import React from "react";
-import "../../style/App.css";
 import Products from "../Products/Products.tsx";
 import LoginForm from "../LoginForm/LoginForm.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";

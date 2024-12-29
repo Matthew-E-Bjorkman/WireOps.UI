@@ -1,16 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit/react";
 
 export const sessionSlice = createSlice({
   name: "session",
   initialState: {
-    loggedIn: false,
+    loggedIn: localStorage.getItem("loggedIn") === "true",
   },
   reducers: {
     logIn: (state) => {
       state.loggedIn = true;
+      localStorage.setItem("loggedIn", "true");
     },
     logOut: (state) => {
       state.loggedIn = false;
+      localStorage.setItem("loggedIn", "false");
     },
   },
 });

@@ -2,7 +2,6 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { logIn } from "../../store/sessionSlice.tsx";
-import "../../style/LoginForm.css";
 
 export default function LoginForm() {
   const [email, setEmail] = React.useState("");

@@ -1,11 +1,11 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import NavBar from "../NavBar/NavBar.tsx";
+import SiteNavBar from "../SiteNavBar/SiteNavBar.tsx";
 
 export default function App() {
   return (
     <>
-      <NavBar />
+      <SiteNavBar />
       <Outlet />
     </>
   );
