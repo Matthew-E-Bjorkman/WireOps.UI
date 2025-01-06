@@ -1,27 +1,22 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logOut } from "../../store/sessionSlice.tsx";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import LogoutButton from "../LogoutButton/LogoutButton.tsx";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const SiteNavBar: React.FC = () => {
-  const isLoggedIn = useSelector((state: any) => state.session.loggedIn);
-  const dispatch = useDispatch();
+  const { isAuthenticated, isLoading } = useAuth0();
   const navigate = useNavigate();
-
-  const handleLoginLogout = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      dispatch(logOut());
-    }
-  };
 
   const navigateToProductPage = () => {
     navigate("/products");
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Navbar bg="info" data-bs-theme="light">
@@ -30,10 +25,12 @@ const SiteNavBar: React.FC = () => {
         <Nav>
           <Nav.Link onClick={navigateToProductPage}>Products</Nav.Link>
         </Nav>
-        <Navbar.Collapse className="justify-content-end">
-          <Nav.Link onClick={handleLoginLogout}>
-            {isLoggedIn ? "Signed in as: *Account Name*" : "Login"}
-          </Nav.Link>
+        <Navbar.Collapse className="justify-content-end px-4">
+          {isAuthenticated && (
+            <Nav.Item>
+              <LogoutButton />
+            </Nav.Item>
+          )}
         </Navbar.Collapse>
       </Container>
     </Navbar>

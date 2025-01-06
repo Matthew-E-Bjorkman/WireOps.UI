@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Product } from "../types/Product";
 import { createSlice } from "@reduxjs/toolkit/react";
+import { security } from "../security/security.ts";
 
 export const productSlice = createSlice({
   name: "product",
@@ -13,9 +14,15 @@ export const productSlice = createSlice({
   reducers: {
     setShowCreateModal: (state, action) => {
       state.showCreateModal = action.payload;
+      if (!action.payload) {
+        state.selectedProduct = {} as Product;
+      }
     },
     setShowEditModal: (state, action) => {
       state.showEditModal = action.payload;
+      if (!action.payload) {
+        state.selectedProduct = {} as Product;
+      }
     },
     setShowConfirmModal: (state, action) => {
       state.showConfirmModal = action.payload;
@@ -31,6 +38,20 @@ export const productApi = createApi({
   tagTypes: ["Product"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://localhost:8081/Product",
+    prepareHeaders: async (headers) => {
+      const options = {
+        authorizationParams: {
+          audience: "https://localhost:8081/",
+          scope: "admin",
+        },
+      };
+      const accessToken = await security.getAccessTokenSilently()(options);
+
+      if (accessToken) {
+        headers.set("authorization", `Bearer ${accessToken}`);
+      }
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     getProductList: builder.query<Product[], void>({

@@ -1,19 +1,36 @@
 import React from "react";
 import Products from "../Products/Products.tsx";
-import LoginForm from "../LoginForm/LoginForm.tsx";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ContentLayout from "../ContentLayout/ContentLayout.tsx";
+import { Route, Routes } from "react-router-dom";
+import {
+  useAuth0,
+  withAuthenticationRequired,
+  WithAuthenticationRequiredOptions,
+} from "@auth0/auth0-react";
+import Loading from "../Loading/Loading.tsx";
+import Error from "../Error/Error.tsx";
+import SiteNavBar from "../SiteNavBar/SiteNavBar.tsx";
+import Home from "../Home/Home.tsx";
+import { security } from "../../security/security.ts";
+
+const ProtectedHome = withAuthenticationRequired(Home);
+const ProtectedProducts = withAuthenticationRequired(Products);
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ContentLayout />}>
-          <Route path="products" index element={<Products />} />
-        </Route>
+  const { isLoading, error, getAccessTokenSilently } = useAuth0();
+  security.setAccessTokenSilently((options) => getAccessTokenSilently(options));
 
-        <Route path="/login" element={<LoginForm />} />
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  return (
+    <>
+      <SiteNavBar />
+      {error && <Error message={error.message} />}
+      <Routes>
+        <Route path="/" index element={<ProtectedHome />} />
+        <Route path="products" element={<ProtectedProducts />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
