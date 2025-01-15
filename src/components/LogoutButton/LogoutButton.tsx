@@ -1,8 +1,13 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useSelector } from "react-redux";
+import { AppRootState } from "../../store/store";
 
 const LogoutButton = () => {
-  const { user, logout } = useAuth0();
+  const { logout } = useAuth0();
+  const userDetails = useSelector(
+    (state: AppRootState) => state.identity.userDetails
+  );
 
   return (
     <button
@@ -11,7 +16,7 @@ const LogoutButton = () => {
         logout({ logoutParams: { returnTo: window.location.origin } })
       }
     >
-      Logged in as: <strong>{user!.sub}</strong>. Log out?
+      Logged in as: <strong>{userDetails.name}</strong>. Log out?
     </button>
   );
 };
