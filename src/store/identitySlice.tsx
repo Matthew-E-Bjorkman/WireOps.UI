@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { User } from "../types/Identity.ts";
+import type { User, UserUpdateRequest } from "../types/Identity.ts";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { security } from "../security/security.ts";
 
 export const identitySlice = createSlice({
   name: "identity",
@@ -59,10 +58,30 @@ export const identityApi = createApi({
     getUserById: builder.query<User, string>({
       query: (id) => `/users/${id}`,
     }),
+    updateUser: builder.mutation<User, Partial<User>>({
+      query: (body) => ({
+        url: `/users/${body.user_id}`,
+        method: "PATCH",
+        body: {
+          email: body.email,
+          email_verified: body.email_verified,
+          name: body.name,
+          nickname: body.nickname,
+          picture: body.picture,
+          app_metadata: body.app_metadata,
+        } as UserUpdateRequest,
+      }),
+      invalidatesTags: ["Identity"],
+      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+        queryFulfilled.then((result) => {
+          dispatch(identitySlice.actions.setUserDetails(result));
+        });
+      },
+    }),
   }),
 });
 
-export const { useGetUserByIdQuery } = identityApi;
+export const { useGetUserByIdQuery, useUpdateUserMutation } = identityApi;
 
 export const { setUserId, setUserDetails } = identitySlice.actions;
 

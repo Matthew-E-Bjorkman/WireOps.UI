@@ -24,6 +24,9 @@ export interface Identity {
 export interface AppMetadata {
   company_name: string;
   subscription: Subscription;
+  company_id: string;
+  given_name: string;
+  family_name: string;
 }
 
 export interface Subscription {
@@ -37,4 +40,13 @@ export interface Subscription {
   subscription_id: string;
   trialDays: number;
   trial_days: number;
+}
+
+export interface UserUpdateRequest {
+  email: string;
+  email_verified: boolean;
+  name: string;
+  nickname: string;
+  picture: string;
+  app_metadata: AppMetadata;
 }

@@ -39,7 +39,7 @@ export const businessApi = createApi({
     getCompanyById: builder.query<Company, string>({
       query: (id) => `company/${id}`,
     }),
-    addCompany: builder.mutation<string, Partial<Company>>({
+    addCompany: builder.mutation<Company, Partial<Company>>({
       query: (body) => ({
         url: "company",
         method: "POST",
