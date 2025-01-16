@@ -16,7 +16,11 @@ const LogoutButton = () => {
         logout({ logoutParams: { returnTo: window.location.origin } })
       }
     >
-      Logged in as: <strong>{userDetails.name}</strong>. Log out?
+      {userDetails && (
+        <div>
+          Logged in as: <strong>{userDetails.name}</strong>. Log out?
+        </div>
+      )}
     </button>
   );
 };

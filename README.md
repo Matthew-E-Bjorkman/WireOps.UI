@@ -68,3 +68,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+openssl req -x509 -newkey rsa:2048 -nodes -keyout local.ui.key -out local.ui.crt -days 365 -subj "/CN=local.ui" -config "C:\Program Files (x86)\OpenSSL\bin\openssl.cnf"

@@ -1,12 +1,19 @@
 {
-    "version": "0.2.0",
-    "configurations": [ 
-        {
-            "name": "Chrome",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:3000",     
-            "webRoot": "${workspaceRoot}/src"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://local.ui:3000/",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMaps": true,
+      "trace": true,
+      "env": {
+        "HTTPS": "true",
+        "SSL_CRT_FILE": "./certs/local.ui.crt",
+        "SSL_KEY_FILE": "./certs/local.ui.key"
+      }
+    }
+  ]
 }

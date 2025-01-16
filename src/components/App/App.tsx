@@ -1,11 +1,7 @@
 import React from "react";
 import Products from "../Products/Products.tsx";
 import { Route, Routes } from "react-router-dom";
-import {
-  useAuth0,
-  withAuthenticationRequired,
-  WithAuthenticationRequiredOptions,
-} from "@auth0/auth0-react";
+import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../Loading/Loading.tsx";
 import Error from "../Error/Error.tsx";
 import SiteNavBar from "../SiteNavBar/SiteNavBar.tsx";
@@ -30,6 +26,7 @@ export default function App() {
     isLoading: userLoading,
     error,
     getAccessTokenSilently,
+    getAccessTokenWithPopup,
   } = useAuth0();
   security.setAccessTokenSilently((options) => getAccessTokenSilently(options));
 

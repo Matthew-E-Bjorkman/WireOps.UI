@@ -38,7 +38,7 @@ root.render(
           domain="dev-uwhi4hpgyvx5ddvc.us.auth0.com"
           clientId="vOWc2856Bvlg0ENuykdxLhaT61RTy2lu"
           authorizationParams={{
-            audience: "https://localhost:8081/",
+            audience: "https://dev-uwhi4hpgyvx5ddvc.us.auth0.com/api/v2/",
             redirect_uri: window.location.origin,
             scope: "admin",
           }}

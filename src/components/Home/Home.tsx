@@ -1,18 +1,19 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { AppRootState } from "../../store/store";
+import { useGetCompanyByIdQuery } from "../../store/businessSlice.tsx";
 
 const Home = () => {
-  const userDetails = useSelector(
-    (state: AppRootState) => state.identity.userDetails
+  const { data: company, isLoading } = useGetCompanyByIdQuery(
+    "7761e09d-9cbe-48f3-ae50-d7b707242e09"
   );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
       <h1>
-        {userDetails != null && (
-          <div>{userDetails.app_metadata?.company_name}</div>
-        )}
+        <div>{company?.name}</div>
       </h1>
     </div>
   );
