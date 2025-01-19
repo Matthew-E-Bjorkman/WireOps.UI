@@ -11,6 +11,7 @@ export const identitySlice = createSlice({
   reducers: {
     setUserId: (state, action) => {
       state.userId = action.payload;
+      // Run GetUser Api endpoint
     },
     setUserDetails: (state, action) => {
       state.userDetails = action.payload;
@@ -57,6 +58,11 @@ export const identityApi = createApi({
   endpoints: (builder) => ({
     getUserById: builder.query<User, string>({
       query: (id) => `/users/${id}`,
+      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+        queryFulfilled.then((result) => {
+          dispatch(identitySlice.actions.setUserDetails(result.data));
+        });
+      },
     }),
     updateUser: builder.mutation<User, Partial<User>>({
       query: (body) => ({
