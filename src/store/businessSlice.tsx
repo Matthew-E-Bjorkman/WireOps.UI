@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Company } from "../types/Company.ts";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { security } from "../security/security.ts";
+import { AppRootState } from "./store.tsx";
 
 export const businessSlice = createSlice({
   name: "business",
@@ -20,14 +20,8 @@ export const businessApi = createApi({
   tagTypes: ["Company"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://localhost:8101/",
-    prepareHeaders: async (headers) => {
-      const options = {
-        authorizationParams: {
-          audience: "https://localhost:8101/",
-          scope: "write:company",
-        },
-      };
-      const accessToken = await security.getAccessTokenSilently()(options);
+    prepareHeaders: async (headers, { getState }) => {
+      const accessToken = (getState() as AppRootState).identity.accessToken;
 
       if (accessToken) {
         headers.set("authorization", `Bearer ${accessToken}`);

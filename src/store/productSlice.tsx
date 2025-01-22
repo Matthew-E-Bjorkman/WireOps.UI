@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Product } from "../types/Product";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { security } from "../security/security.ts";
+import { AppRootState } from "./store.tsx";
 
 export const productSlice = createSlice({
   name: "product",
@@ -38,14 +38,8 @@ export const productApi = createApi({
   tagTypes: ["Product"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://localhost:8081/Product",
-    prepareHeaders: async (headers) => {
-      const options = {
-        authorizationParams: {
-          audience: "https://localhost:8081/",
-          scope: "admin",
-        },
-      };
-      const accessToken = await security.getAccessTokenSilently()(options);
+    prepareHeaders: async (headers, { getState }) => {
+      const accessToken = (getState() as AppRootState).identity.accessToken;
 
       if (accessToken) {
         headers.set("authorization", `Bearer ${accessToken}`);

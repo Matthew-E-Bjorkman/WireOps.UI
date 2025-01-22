@@ -1,13 +1,9 @@
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useSelector } from "react-redux";
-import { AppRootState } from "../../store/store";
 
 const LogoutButton = () => {
   const { logout } = useAuth0();
-  const userDetails = useSelector(
-    (state: AppRootState) => state.identity.userDetails
-  );
+  const { user, isLoading } = useAuth0();
 
   return (
     <button
@@ -16,11 +12,12 @@ const LogoutButton = () => {
         logout({ logoutParams: { returnTo: window.location.origin } })
       }
     >
-      {userDetails && (
+      {!isLoading && (
         <div>
-          Logged in as: <strong>{userDetails.name}</strong>. Log out?
+          Welcome <strong>{user?.given_name}</strong>. Log out?
         </div>
       )}
+      {isLoading && <div>Log out?</div>}
     </button>
   );
 };
