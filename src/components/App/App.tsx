@@ -20,6 +20,7 @@ import {
   useAddCompanyMutation,
 } from "../../store/businessSlice.tsx";
 
+const ProtectedLoading = withAuthenticationRequired(Loading);
 const ProtectedHome = withAuthenticationRequired(Home);
 const ProtectedProducts = withAuthenticationRequired(Products);
 
@@ -80,8 +81,8 @@ export default function App() {
     }
   }, [userDetails]);
 
-  if (userLoading) {
-    return <Loading />;
+  if (userLoading || !userDetails) {
+    return <ProtectedLoading />;
   }
 
   return (
