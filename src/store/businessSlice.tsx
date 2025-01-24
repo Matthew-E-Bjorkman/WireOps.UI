@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Company } from "../types/Company.ts";
+import type { Company } from "../types/Company";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { AppRootState } from "./store.tsx";
+import { AppRootState } from "./store";
 
 export const businessSlice = createSlice({
   name: "business",

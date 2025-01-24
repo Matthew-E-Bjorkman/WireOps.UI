@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Product } from "../types/Product";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { AppRootState } from "./store.tsx";
+import { AppRootState } from "./store";
 
-export const productSlice = createSlice({
-  name: "product",
+export const inventorySlice = createSlice({
+  name: "inventory",
   initialState: {
     showCreateModal: false,
     showEditModal: false,
@@ -33,8 +33,8 @@ export const productSlice = createSlice({
   },
 });
 
-export const productApi = createApi({
-  reducerPath: "productApi",
+export const inventoryApi = createApi({
+  reducerPath: "inventoryApi",
   tagTypes: ["Product"],
   baseQuery: fetchBaseQuery({
     baseUrl: "https://localhost:8081/Product",
@@ -64,8 +64,8 @@ export const productApi = createApi({
       invalidatesTags: ["Product"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(productSlice.actions.updateSelectedProduct({}));
-          dispatch(productApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.updateSelectedProduct({}));
+          dispatch(inventoryApi.endpoints.getProductList.initiate());
         });
       },
     }),
@@ -78,8 +78,8 @@ export const productApi = createApi({
       invalidatesTags: ["Product"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(productSlice.actions.updateSelectedProduct({}));
-          dispatch(productApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.updateSelectedProduct({}));
+          dispatch(inventoryApi.endpoints.getProductList.initiate());
         });
       },
     }),
@@ -91,8 +91,8 @@ export const productApi = createApi({
       invalidatesTags: ["Product"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(productSlice.actions.updateSelectedProduct({}));
-          dispatch(productApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.updateSelectedProduct({}));
+          dispatch(inventoryApi.endpoints.getProductList.initiate());
         });
       },
     }),
@@ -105,13 +105,13 @@ export const {
   useAddProductMutation,
   useEditProductMutation,
   useDeleteProductMutation,
-} = productApi;
+} = inventoryApi;
 
 export const {
   setShowCreateModal,
   setShowEditModal,
   setShowConfirmModal,
   updateSelectedProduct,
-} = productSlice.actions;
+} = inventorySlice.actions;
 
-export default productSlice.reducer;
+export default inventorySlice.reducer;

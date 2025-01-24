@@ -1,5 +1,3 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { User, UserUpdateRequest } from "../types/Identity.ts";
 import { createSlice } from "@reduxjs/toolkit/react";
 
 export const identitySlice = createSlice({
