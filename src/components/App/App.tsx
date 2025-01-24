@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-//import Products from "../Products/Products";
 import { Route, Routes } from "react-router-dom";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../Loading/Loading";
@@ -12,7 +11,7 @@ import { AppRootState } from "../../store/store";
 import { CompanyRequest } from "../../types/Company";
 import { setCompany, useAddCompanyMutation } from "../../store/businessSlice";
 import { Callback } from "../Callback/Callback";
-import NotFound from "../NotFound/NotFound";
+import NotFound from "../../pages/NotFound/NotFound";
 
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 import type {} from "@mui/x-charts/themeAugmentation";
@@ -33,10 +32,11 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from "../../theme/customizations";
+import ItemsPage from "../../pages/Items/ItemsPage";
 
 const ProtectedLoading = withAuthenticationRequired(Loading);
 const ProtectedHome = withAuthenticationRequired(Home);
-//const ProtectedProducts = withAuthenticationRequired(Products);
+const ProtectedItemsPage = withAuthenticationRequired(ItemsPage);
 
 export default function App(props: { disableCustomTheme?: boolean }) {
   const dispatch = useDispatch();
@@ -45,7 +45,6 @@ export default function App(props: { disableCustomTheme?: boolean }) {
     user,
     isLoading: userLoading,
     isAuthenticated,
-    error,
     getIdTokenClaims,
   } = useAuth0();
   const access_token = useSelector(
@@ -117,22 +116,23 @@ export default function App(props: { disableCustomTheme?: boolean }) {
             overflow: "auto",
           })}
         >
+          <Header />
           <Stack
             spacing={2}
             sx={{
               alignItems: "center",
               mx: 3,
               pb: 5,
-              mt: { xs: 8, md: 0 },
+              mt: { xs: 10, md: 2 },
             }}
           >
-            <Header />
-            <MainGrid />
-            {/* <Routes>
+            <Routes>
               <Route path="/" index element={<ProtectedHome />} />
+              <Route path="/items" element={<ProtectedItemsPage />} />
               <Route path="/callback" element={<Callback />} />
+              <Route path="/example" element={<MainGrid />} />
               <Route path="*" element={<NotFound />} />
-            </Routes> */}
+            </Routes>
           </Stack>
         </Box>
       </Box>

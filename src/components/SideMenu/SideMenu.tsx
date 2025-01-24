@@ -40,9 +40,16 @@ export default function SideMenu() {
           display: "flex",
           mt: "calc(var(--template-frame-height, 0px) + 4px)",
           p: 1.5,
+          minHeight: 56,
+          maxHeight: 56,
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <SelectContent />
+        <Typography variant="h6" sx={{ fontWeight: 500, lineHeight: "20px" }}>
+          WireOps Text Logo
+        </Typography>
+        {/* <SelectContent /> */}
       </Box>
       <Divider />
       <Box

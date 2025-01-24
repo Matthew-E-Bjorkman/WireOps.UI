@@ -19,6 +19,13 @@ export default function Header() {
         justifyContent: "space-between",
         maxWidth: { sm: "100%", md: "1700px" },
         pt: 1.5,
+        px: 3,
+        pb: 1.5,
+        bgcolor: "background.paper",
+        backgroundImage: "none",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        boxShadow: 0,
       }}
       spacing={2}
     >

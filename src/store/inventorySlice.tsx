@@ -1,43 +1,50 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Product } from "../types/Product";
-import { createSlice } from "@reduxjs/toolkit/react";
+import type { Item } from "../types/Item";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit/react";
 import { AppRootState } from "./store";
+
+interface InventoryState {
+  items: Item[];
+  selectedItem: Item | null;
+  isNewItem: boolean;
+}
+
+const initialState: InventoryState = {
+  items: [],
+  selectedItem: null,
+  isNewItem: false,
+};
 
 export const inventorySlice = createSlice({
   name: "inventory",
-  initialState: {
-    showCreateModal: false,
-    showEditModal: false,
-    showConfirmModal: false,
-    selectedProduct: {} as Product,
-  },
+  initialState: initialState,
   reducers: {
-    setShowCreateModal: (state, action) => {
-      state.showCreateModal = action.payload;
-      if (!action.payload) {
-        state.selectedProduct = {} as Product;
+    setItems(state, action: PayloadAction<Item[]>) {
+      state.items = action.payload;
+    },
+    setSelectedItem(state, action: PayloadAction<Item | null>) {
+      state.selectedItem = action.payload;
+    },
+    setIsNewItem(state, action: PayloadAction<boolean>) {
+      state.isNewItem = action.payload;
+    },
+    addItem(state, action: PayloadAction<Item>) {
+      state.items.push(action.payload);
+    },
+    updateItem(state, action: PayloadAction<Item>) {
+      const index = state.items.findIndex((p) => p.id === action.payload.id);
+      if (index !== -1) {
+        state.items[index] = action.payload;
       }
-    },
-    setShowEditModal: (state, action) => {
-      state.showEditModal = action.payload;
-      if (!action.payload) {
-        state.selectedProduct = {} as Product;
-      }
-    },
-    setShowConfirmModal: (state, action) => {
-      state.showConfirmModal = action.payload;
-    },
-    updateSelectedProduct: (state, action) => {
-      state.selectedProduct = action.payload;
     },
   },
 });
 
 export const inventoryApi = createApi({
   reducerPath: "inventoryApi",
-  tagTypes: ["Product"],
+  tagTypes: ["Item"],
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://localhost:8081/Product",
+    baseUrl: "https://localhost:8081/Product", //Todo: adjust api
     prepareHeaders: async (headers, { getState }) => {
       const accessToken = (getState() as AppRootState).identity.accessToken;
 
@@ -48,51 +55,51 @@ export const inventoryApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getProductList: builder.query<Product[], void>({
+    getItemList: builder.query<Item[], void>({
       query: () => "",
-      providesTags: ["Product"],
+      providesTags: ["Item"],
     }),
-    getProductById: builder.query<Product, string>({
+    getItemById: builder.query<Item, string>({
       query: (id) => `/${id}`,
     }),
-    addProduct: builder.mutation<string, Partial<Product>>({
+    addItem: builder.mutation<string, Partial<Item>>({
       query: (body) => ({
         url: "",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Product"],
+      invalidatesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(inventorySlice.actions.updateSelectedProduct({}));
-          dispatch(inventoryApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.setSelectedItem(null));
+          dispatch(inventoryApi.endpoints.getItemList.initiate());
         });
       },
     }),
-    editProduct: builder.mutation<boolean, Partial<Product>>({
+    editItem: builder.mutation<boolean, Partial<Item>>({
       query: (body) => ({
         url: `/${body.id}`,
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["Product"],
+      invalidatesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(inventorySlice.actions.updateSelectedProduct({}));
-          dispatch(inventoryApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.setSelectedItem(null));
+          dispatch(inventoryApi.endpoints.getItemList.initiate());
         });
       },
     }),
-    deleteProduct: builder.mutation<boolean, string>({
+    deleteItem: builder.mutation<boolean, string>({
       query: (id) => ({
         url: `/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Product"],
+      invalidatesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(inventorySlice.actions.updateSelectedProduct({}));
-          dispatch(inventoryApi.endpoints.getProductList.initiate());
+          dispatch(inventorySlice.actions.setSelectedItem(null));
+          dispatch(inventoryApi.endpoints.getItemList.initiate());
         });
       },
     }),
@@ -100,18 +107,14 @@ export const inventoryApi = createApi({
 });
 
 export const {
-  useGetProductListQuery,
-  useGetProductByIdQuery,
-  useAddProductMutation,
-  useEditProductMutation,
-  useDeleteProductMutation,
+  useGetItemListQuery,
+  useGetItemByIdQuery,
+  useAddItemMutation,
+  useEditItemMutation,
+  useDeleteItemMutation,
 } = inventoryApi;
 
-export const {
-  setShowCreateModal,
-  setShowEditModal,
-  setShowConfirmModal,
-  updateSelectedProduct,
-} = inventorySlice.actions;
+export const { setItems, setSelectedItem, setIsNewItem, addItem, updateItem } =
+  inventorySlice.actions;
 
 export default inventorySlice.reducer;

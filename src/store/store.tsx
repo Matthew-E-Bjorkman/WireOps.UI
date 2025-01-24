@@ -7,9 +7,9 @@ import businessReducer, { businessApi } from "./businessSlice";
 
 export const store = configureStore({
   reducer: {
-    product: inventoryReducer,
+    inventory: inventoryReducer,
     identity: identityReducer,
-    company: businessReducer,
+    business: businessReducer,
     [inventoryApi.reducerPath]: inventoryApi.reducer,
     [businessApi.reducerPath]: businessApi.reducer,
   },

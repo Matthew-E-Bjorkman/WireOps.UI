@@ -1,6 +1,4 @@
-// Define a product type
-
-export interface Product {
+export interface Item {
   id: string;
   name: string;
   sku: string;

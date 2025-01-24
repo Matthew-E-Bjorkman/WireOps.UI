@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -14,24 +14,31 @@ import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 
 const mainListItems = [
-  { text: "Home", icon: <HomeRoundedIcon /> },
-  { text: "Analytics", icon: <AnalyticsRoundedIcon /> },
-  { text: "Clients", icon: <PeopleRoundedIcon /> },
-  { text: "Tasks", icon: <AssignmentRoundedIcon /> },
+  { text: "Home", path: "/", icon: <HomeRoundedIcon /> },
+  { text: "Items", path: "/items", icon: <AnalyticsRoundedIcon /> },
+  { text: "Staff", path: "/", icon: <PeopleRoundedIcon /> },
+  { text: "Company", path: "/", icon: <AssignmentRoundedIcon /> },
 ];
 
 const secondaryListItems = [
-  { text: "Settings", icon: <SettingsRoundedIcon /> },
-  { text: "About", icon: <InfoRoundedIcon /> },
-  { text: "Feedback", icon: <HelpRoundedIcon /> },
+  { text: "Settings", path: "/", icon: <SettingsRoundedIcon /> },
+  { text: "About", path: "/", icon: <InfoRoundedIcon /> },
+  { text: "Feedback", path: "/", icon: <HelpRoundedIcon /> },
 ];
 
 export default function MenuContent() {
+  const navigate = useNavigate();
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
         {mainListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: "block" }}>
+          <ListItem
+            key={index}
+            disablePadding
+            sx={{ display: "block" }}
+            onClick={() => navigate(item.path)}
+          >
             <ListItemButton selected={index === 0}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
@@ -41,7 +48,12 @@ export default function MenuContent() {
       </List>
       <List dense>
         {secondaryListItems.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: "block" }}>
+          <ListItem
+            key={index}
+            disablePadding
+            sx={{ display: "block" }}
+            onClick={() => navigate(item.path)}
+          >
             <ListItemButton>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />

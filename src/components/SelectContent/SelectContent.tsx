@@ -43,7 +43,7 @@ export default function SelectContent() {
       inputProps={{ "aria-label": "Select company" }}
       fullWidth
       sx={{
-        maxHeight: 56,
+        maxHeight: 48,
         width: 215,
         "&.MuiList-root": {
           p: "8px",
