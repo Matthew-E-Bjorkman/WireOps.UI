@@ -27,12 +27,32 @@ const StyledLink = styled(Link)(({ theme }) => ({
 export default function NavbarBreadcrumbs() {
   const location = useLocation();
   const routeSegments = location.pathname.split("/").filter(Boolean);
-  const paths = routeSegments.map((segment, index) => {
-    return {
-      name: segment.charAt(0).toUpperCase() + segment.slice(1),
-      path: `/${routeSegments.slice(0, index + 1).join("/")}`,
-    };
-  });
+  const paths = routeSegments
+    .filter((segment) => segment != "callback")
+    .map((segment, index) => {
+      if (segment === "00000000-0000-0000-0000-000000000000") {
+        // This is a new Guid, create flow
+        return {
+          name: "New",
+          path: `/${routeSegments.slice(0, index).join("/")}`,
+        };
+      }
+
+      const guidRegex = new RegExp(
+        "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      );
+      if (guidRegex.test(segment)) {
+        return {
+          name: "Detail", //TODO: Add a state dictory to map the guid to a name
+          path: `/${routeSegments.slice(0, index).join("/")}`,
+        };
+      }
+
+      return {
+        name: segment.charAt(0).toUpperCase() + segment.slice(1),
+        path: `/${routeSegments.slice(0, index + 1).join("/")}`,
+      };
+    });
 
   return (
     <StyledBreadcrumbs

@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
-import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+import AppRoutes from "../AppRoutes/AppRoutes";
+import { StafferGetParams } from "../../types/Business/Staffer";
+import {
+  GetTokenSilentlyOptions,
+  useAuth0,
+  withAuthenticationRequired,
+} from "@auth0/auth0-react";
 import Loading from "../Loading/Loading";
-import Home from "../Home/Home";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setAccessToken,
@@ -17,8 +21,6 @@ import {
   useGetCompanyByIdQuery,
   useGetStafferByIdQuery,
 } from "../../store/businessSlice";
-import { Callback } from "../Callback/Callback";
-import NotFound from "../../pages/NotFound/NotFound";
 
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 import type {} from "@mui/x-charts/themeAugmentation";
@@ -30,7 +32,6 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import AppNavbar from "../AppNavbar/AppNavbar";
 import Header from "../Header/Header";
-import MainGrid from "../MainGrid/MainGrid";
 import SideMenu from "../SideMenu/SideMenu";
 import AppTheme from "../../theme/AppTheme";
 import {
@@ -39,12 +40,8 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from "../../theme/customizations";
-import ItemsPage from "../../pages/Items/ItemsPage";
-import { StafferGetParams } from "../../types/Business/Staffer";
 
 const ProtectedLoading = withAuthenticationRequired(Loading);
-const ProtectedHome = withAuthenticationRequired(Home);
-const ProtectedItemsPage = withAuthenticationRequired(ItemsPage);
 
 export default function App(props: { disableCustomTheme?: boolean }) {
   const dispatch = useDispatch();
@@ -61,7 +58,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
 
   const [addCompany] = useAddCompanyMutation();
   const { data: company } = useGetCompanyByIdQuery(tenant_id, {
-    skip: !tenant_id,
+    skip: !tenant_id || !access_token,
   });
   const { data: staffer } = useGetStafferByIdQuery(
     {
@@ -98,15 +95,21 @@ export default function App(props: { disableCustomTheme?: boolean }) {
               return;
             }
 
+            dispatch(setTenantId(result.data!.id));
+
             //Reset the token since we have a new company
-            getAccessTokenSilently().then((token) => {
+            getAccessTokenSilently({
+              cacheMode: "off",
+            }).then((token) => {
               dispatch(setAccessToken(token));
             });
           });
         } else if (userDetails && userDetails.tenant_id) {
           dispatch(setTenantId(userDetails.tenant_id));
           //Reset the token since we have a company
-          getAccessTokenSilently().then((token) => {
+          getAccessTokenSilently({
+            cacheMode: "off",
+          }).then((token) => {
             dispatch(setAccessToken(token));
           });
         }
@@ -155,13 +158,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
               mt: { xs: 10, md: 2 },
             }}
           >
-            <Routes>
-              <Route path="/" index element={<ProtectedHome />} />
-              <Route path="/items" element={<ProtectedItemsPage />} />
-              <Route path="/callback" element={<Callback />} />
-              <Route path="/example" element={<MainGrid />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppRoutes />
           </Stack>
         </Box>
       </Box>

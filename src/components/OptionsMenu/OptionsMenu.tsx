@@ -26,8 +26,10 @@ export default function OptionsMenu() {
   };
   const handleClose = (event: React.MouseEvent<HTMLElement>) => {
     if (
-      event.target instanceof HTMLElement &&
-      event.target.textContent === "Logout"
+      (event.target instanceof HTMLElement &&
+        event.target.textContent === "Logout") ||
+      (event.currentTarget instanceof HTMLElement &&
+        event.currentTarget.textContent === "Logout")
     ) {
       logout({ logoutParams: { returnTo: window.location.origin } });
     } else if (

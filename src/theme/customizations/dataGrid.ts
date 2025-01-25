@@ -44,6 +44,12 @@ export const dataGridCustomizations: DataGridComponents<Theme> = {
       }),
       cell: ({ theme }) => ({
         borderTopColor: theme.palette.divider,
+        "&:focus": {
+          outline: "none",
+        },
+        "&:focus-within": {
+          outline: "none",
+        },
       }),
       menu: ({ theme }) => ({
         borderRadius: theme.shape.borderRadius,
@@ -70,6 +76,7 @@ export const dataGridCustomizations: DataGridComponents<Theme> = {
         },
         "&:hover": {
           backgroundColor: theme.palette.action.hover,
+          cursor: "pointer",
         },
         "&.Mui-selected": {
           background: theme.palette.action.selected,

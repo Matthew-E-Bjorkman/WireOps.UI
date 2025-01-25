@@ -18,6 +18,7 @@ const mainListItems = [
   { text: "Items", path: "/items", icon: <AnalyticsRoundedIcon /> },
   { text: "Staff", path: "/staff", icon: <PeopleRoundedIcon /> },
   { text: "Company", path: "/company", icon: <AssignmentRoundedIcon /> },
+  { text: "Example", path: "/example", icon: <AssignmentRoundedIcon /> },
 ];
 
 const secondaryListItems = [
