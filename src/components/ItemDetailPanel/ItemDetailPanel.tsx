@@ -1,5 +1,5 @@
 import { Paper, Typography } from "@mui/material";
-import { Item } from "../../types/Item";
+import { Item } from "../../types/Inventory/Item";
 import ItemEditPanel from "../ItemEditPanel/ItemEditPanel";
 
 interface ItemDetailPanelProps {

@@ -6,10 +6,13 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import SelectContent from "../SelectContent/SelectContent";
 import MenuContent from "../MenuContent/MenuContent";
 import CardAlert from "../CardAlert/CardAlert";
 import OptionsMenu from "../OptionsMenu/OptionsMenu";
+import { Tooltip } from "@mui/material";
+import { useSelector } from "react-redux";
+
+import { AppRootState } from "../../store/store";
 
 const drawerWidth = 240;
 
@@ -25,6 +28,10 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
+  const { current_staffer } = useSelector(
+    (state: AppRootState) => state.business
+  );
+
   return (
     <Drawer
       variant="permanent"
@@ -49,7 +56,6 @@ export default function SideMenu() {
         <Typography variant="h6" sx={{ fontWeight: 500, lineHeight: "20px" }}>
           WireOps Text Logo
         </Typography>
-        {/* <SelectContent /> */}
       </Box>
       <Divider />
       <Box
@@ -75,20 +81,42 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
+          alt={current_staffer?.given_name + " " + current_staffer?.family_name}
           src="/static/images/avatar/7.jpg"
           sx={{ width: 36, height: 36 }}
         />
-        <Box sx={{ mr: "auto" }}>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 500, lineHeight: "16px" }}
+        <Box sx={{ width: "100%" }}>
+          <Tooltip
+            title={
+              current_staffer?.given_name + " " + current_staffer?.family_name
+            }
           >
-            Riley Carter
-          </Typography>
-          <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            riley@email.com
-          </Typography>
+            <Typography
+              variant="body2"
+              display={"block"}
+              noWrap={true}
+              width={119}
+              sx={{
+                fontWeight: 500,
+                lineHeight: "16px",
+              }}
+            >
+              {current_staffer?.given_name} {current_staffer?.family_name}
+            </Typography>
+          </Tooltip>
+          <Tooltip title={current_staffer?.email}>
+            <Typography
+              variant="caption"
+              noWrap={true}
+              display={"block"}
+              width={119}
+              sx={{
+                color: "text.secondary",
+              }}
+            >
+              {current_staffer?.email}
+            </Typography>
+          </Tooltip>
         </Box>
         <OptionsMenu />
       </Stack>

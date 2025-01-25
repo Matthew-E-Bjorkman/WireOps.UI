@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -16,18 +16,22 @@ import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 const mainListItems = [
   { text: "Home", path: "/", icon: <HomeRoundedIcon /> },
   { text: "Items", path: "/items", icon: <AnalyticsRoundedIcon /> },
-  { text: "Staff", path: "/", icon: <PeopleRoundedIcon /> },
-  { text: "Company", path: "/", icon: <AssignmentRoundedIcon /> },
+  { text: "Staff", path: "/staff", icon: <PeopleRoundedIcon /> },
+  { text: "Company", path: "/company", icon: <AssignmentRoundedIcon /> },
 ];
 
 const secondaryListItems = [
-  { text: "Settings", path: "/", icon: <SettingsRoundedIcon /> },
-  { text: "About", path: "/", icon: <InfoRoundedIcon /> },
-  { text: "Feedback", path: "/", icon: <HelpRoundedIcon /> },
+  { text: "Settings", path: "/settings", icon: <SettingsRoundedIcon /> },
+  { text: "About", path: "/about", icon: <InfoRoundedIcon /> },
+  { text: "Feedback", path: "/feedback", icon: <HelpRoundedIcon /> },
 ];
 
 export default function MenuContent() {
   const navigate = useNavigate();
+
+  // Get route segments
+  const location = useLocation();
+  const route = location.pathname;
 
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
@@ -39,7 +43,7 @@ export default function MenuContent() {
             sx={{ display: "block" }}
             onClick={() => navigate(item.path)}
           >
-            <ListItemButton selected={index === 0}>
+            <ListItemButton selected={route === item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
@@ -54,7 +58,7 @@ export default function MenuContent() {
             sx={{ display: "block" }}
             onClick={() => navigate(item.path)}
           >
-            <ListItemButton>
+            <ListItemButton selected={route === item.path}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

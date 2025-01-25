@@ -10,20 +10,42 @@ import ListItemIcon, { listItemIconClasses } from "@mui/material/ListItemIcon";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import MenuButton from "../MenuButton/MenuButton";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 const MenuItem = styled(MuiMenuItem)({
   margin: "2px 0",
 });
 
 export default function OptionsMenu() {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent<HTMLElement>) => {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.textContent === "Logout"
+    ) {
+      logout({ logoutParams: { returnTo: window.location.origin } });
+    } else if (
+      event.target instanceof HTMLElement &&
+      event.target.textContent === "My account"
+    ) {
+      //TODO: redirect to billing page
+    } else if (
+      event.target instanceof HTMLElement &&
+      event.target.textContent === "Settings"
+    ) {
+      //Navigate to settings page
+      navigate("/settings");
+    }
+
     setAnchorEl(null);
   };
+  const { logout } = useAuth0();
   return (
     <React.Fragment>
       <MenuButton
@@ -53,10 +75,8 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem onClick={handleClose}>My account</MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>Add another account</MenuItem>
         <MenuItem onClick={handleClose}>Settings</MenuItem>
         <Divider />
         <MenuItem

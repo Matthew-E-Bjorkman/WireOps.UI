@@ -2,7 +2,7 @@ import { useForm, Controller } from "react-hook-form";
 import { updateItem, addItem } from "../../store/inventorySlice";
 import { AppRootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { Item } from "../../types/Item";
+import { Item } from "../../types/Inventory/Item";
 
 const ItemEditPanel = () => {
   const dispatch = useDispatch();

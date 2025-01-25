@@ -2,14 +2,21 @@ import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../Loading/Loading";
-import Error from "../Error/Error";
-import SiteNavBar from "../SiteNavBar/SiteNavBar";
 import Home from "../Home/Home";
 import { useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setUserId } from "../../store/identitySlice";
+import {
+  setAccessToken,
+  setUserId,
+  setTenantId,
+} from "../../store/identitySlice";
+import { setCurrentStaffer } from "../../store/businessSlice";
 import { AppRootState } from "../../store/store";
-import { CompanyRequest } from "../../types/Company";
-import { setCompany, useAddCompanyMutation } from "../../store/businessSlice";
+import { CompanyRequest } from "../../types/Business/Company";
+import {
+  useAddCompanyMutation,
+  useGetCompanyByIdQuery,
+  useGetStafferByIdQuery,
+} from "../../store/businessSlice";
 import { Callback } from "../Callback/Callback";
 import NotFound from "../../pages/NotFound/NotFound";
 
@@ -33,6 +40,7 @@ import {
   treeViewCustomizations,
 } from "../../theme/customizations";
 import ItemsPage from "../../pages/Items/ItemsPage";
+import { StafferGetParams } from "../../types/Business/Staffer";
 
 const ProtectedLoading = withAuthenticationRequired(Loading);
 const ProtectedHome = withAuthenticationRequired(Home);
@@ -47,10 +55,21 @@ export default function App(props: { disableCustomTheme?: boolean }) {
     isAuthenticated,
     getIdTokenClaims,
   } = useAuth0();
-  const access_token = useSelector(
-    (state: AppRootState) => state.identity.accessToken
-  );
+  const { access_token } = useSelector((state: AppRootState) => state.identity);
+  const { tenant_id } = useSelector((state: AppRootState) => state.identity);
+  const { staffers } = useSelector((state: AppRootState) => state.business);
+
   const [addCompany] = useAddCompanyMutation();
+  const { data: company } = useGetCompanyByIdQuery(tenant_id, {
+    skip: !tenant_id,
+  });
+  const { data: staffer } = useGetStafferByIdQuery(
+    {
+      company_id: company?.id,
+      id: staffers.find((s) => s.user_id === user?.sub)?.id,
+    } as StafferGetParams,
+    { skip: !company || staffers.length === 0 }
+  );
 
   if (access_token === "") {
     //Get a token for internal API use
@@ -64,7 +83,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
       dispatch(setUserId(user!.sub!));
 
       getIdTokenClaims().then((userDetails) => {
-        if (userDetails && !userDetails.tenant_id) {
+        if (userDetails && !userDetails.tenant_id && access_token != "") {
           const companyRequest: CompanyRequest = {
             name: userDetails.nickname!,
             owneremail: userDetails.email!,
@@ -79,17 +98,27 @@ export default function App(props: { disableCustomTheme?: boolean }) {
               return;
             }
 
-            dispatch(setCompany(result.data!));
-
             //Reset the token since we have a new company
             getAccessTokenSilently().then((token) => {
               dispatch(setAccessToken(token));
             });
           });
+        } else if (userDetails && userDetails.tenant_id) {
+          dispatch(setTenantId(userDetails.tenant_id));
+          //Reset the token since we have a company
+          getAccessTokenSilently().then((token) => {
+            dispatch(setAccessToken(token));
+          });
         }
       });
     }
   }, [access_token, userLoading]);
+
+  useEffect(() => {
+    if (staffer) {
+      dispatch(setCurrentStaffer(staffer));
+    }
+  }, [staffer]);
 
   if (userLoading || !isAuthenticated) {
     return <ProtectedLoading />;
