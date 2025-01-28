@@ -1,21 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
-import productReducer, { productApi } from "./productSlice.tsx";
-import identityReducer from "./identitySlice.tsx";
-import businessReducer, { businessApi } from "./businessSlice.tsx";
+import inventoryReducer, { inventoryApi } from "./inventorySlice";
+import identityReducer from "./identitySlice";
+import businessReducer, { businessApi } from "./businessSlice";
 
 export const store = configureStore({
   reducer: {
-    product: productReducer,
+    inventory: inventoryReducer,
     identity: identityReducer,
-    company: businessReducer,
-    [productApi.reducerPath]: productApi.reducer,
+    business: businessReducer,
+    [inventoryApi.reducerPath]: inventoryApi.reducer,
     [businessApi.reducerPath]: businessApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(productApi.middleware)
+      .concat(inventoryApi.middleware)
       .concat(businessApi.middleware),
 });
 

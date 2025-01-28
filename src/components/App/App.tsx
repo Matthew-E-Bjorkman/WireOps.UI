@@ -1,40 +1,72 @@
 import React, { useEffect } from "react";
-import Products from "../Products/Products.tsx";
-import { Route, Routes } from "react-router-dom";
-import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
-import Loading from "../Loading/Loading.tsx";
-import Error from "../Error/Error.tsx";
-import SiteNavBar from "../SiteNavBar/SiteNavBar.tsx";
-import Home from "../Home/Home.tsx";
-import { useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setUserId } from "../../store/identitySlice.tsx";
-import { AppRootState } from "../../store/store.tsx";
-import { CompanyRequest } from "../../types/Company.ts";
+import AppRoutes from "../AppRoutes/AppRoutes";
+import { StafferGetParams } from "../../types/Business/Staffer";
 import {
-  setCompany,
+  GetTokenSilentlyOptions,
+  useAuth0,
+  withAuthenticationRequired,
+} from "@auth0/auth0-react";
+import Loading from "../Loading/Loading";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setAccessToken,
+  setUserId,
+  setTenantId,
+} from "../../store/identitySlice";
+import { setCurrentStaffer } from "../../store/businessSlice";
+import { AppRootState } from "../../store/store";
+import { CompanyRequest } from "../../types/Business/Company";
+import {
   useAddCompanyMutation,
-} from "../../store/businessSlice.tsx";
-import { Callback } from "../Callback/Callback.tsx";
-import NotFound from "../NotFound/NotFound.tsx";
+  useGetCompanyByIdQuery,
+  useGetStafferByIdQuery,
+} from "../../store/businessSlice";
+
+import type {} from "@mui/x-date-pickers/themeAugmentation";
+import type {} from "@mui/x-charts/themeAugmentation";
+import type {} from "@mui/x-data-grid/themeAugmentation";
+import type {} from "@mui/x-tree-view/themeAugmentation";
+import { alpha } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import AppNavbar from "../AppNavbar/AppNavbar";
+import Header from "../Header/Header";
+import SideMenu from "../SideMenu/SideMenu";
+import AppTheme from "../../theme/AppTheme";
+import {
+  chartsCustomizations,
+  dataGridCustomizations,
+  datePickersCustomizations,
+  treeViewCustomizations,
+} from "../../theme/customizations";
 
 const ProtectedLoading = withAuthenticationRequired(Loading);
-const ProtectedHome = withAuthenticationRequired(Home);
-const ProtectedProducts = withAuthenticationRequired(Products);
 
-export default function App() {
+export default function App(props: { disableCustomTheme?: boolean }) {
   const dispatch = useDispatch();
   const {
     getAccessTokenSilently,
     user,
     isLoading: userLoading,
     isAuthenticated,
-    error,
     getIdTokenClaims,
   } = useAuth0();
-  const access_token = useSelector(
-    (state: AppRootState) => state.identity.accessToken
-  );
+  const { access_token } = useSelector((state: AppRootState) => state.identity);
+  const { tenant_id } = useSelector((state: AppRootState) => state.identity);
+  const { staffers } = useSelector((state: AppRootState) => state.business);
+
   const [addCompany] = useAddCompanyMutation();
+  const { data: company } = useGetCompanyByIdQuery(tenant_id, {
+    skip: !tenant_id || !access_token,
+  });
+  const { data: staffer } = useGetStafferByIdQuery(
+    {
+      company_id: company?.id,
+      id: staffers.find((s) => s.user_id === user?.sub)?.id,
+    } as StafferGetParams,
+    { skip: !company || staffers.length === 0 }
+  );
 
   if (access_token === "") {
     //Get a token for internal API use
@@ -48,7 +80,7 @@ export default function App() {
       dispatch(setUserId(user!.sub!));
 
       getIdTokenClaims().then((userDetails) => {
-        if (userDetails && !userDetails.tenant_id) {
+        if (userDetails && !userDetails.tenant_id && access_token != "") {
           const companyRequest: CompanyRequest = {
             name: userDetails.nickname!,
             owneremail: userDetails.email!,
@@ -63,32 +95,73 @@ export default function App() {
               return;
             }
 
-            dispatch(setCompany(result.data!));
+            dispatch(setTenantId(result.data!.id));
 
             //Reset the token since we have a new company
-            getAccessTokenSilently().then((token) => {
+            getAccessTokenSilently({
+              cacheMode: "off",
+            }).then((token) => {
               dispatch(setAccessToken(token));
             });
+          });
+        } else if (userDetails && userDetails.tenant_id) {
+          dispatch(setTenantId(userDetails.tenant_id));
+          //Reset the token since we have a company
+          getAccessTokenSilently({
+            cacheMode: "off",
+          }).then((token) => {
+            dispatch(setAccessToken(token));
           });
         }
       });
     }
   }, [access_token, userLoading]);
 
+  useEffect(() => {
+    if (staffer) {
+      dispatch(setCurrentStaffer(staffer));
+    }
+  }, [staffer]);
+
   if (userLoading || !isAuthenticated) {
     return <ProtectedLoading />;
   }
 
+  const xThemeComponents = {
+    ...chartsCustomizations,
+    ...dataGridCustomizations,
+    ...datePickersCustomizations,
+    ...treeViewCustomizations,
+  };
+
   return (
-    <>
-      <SiteNavBar />
-      {error && <Error message={error.message} />}
-      <Routes>
-        <Route path="/" index element={<ProtectedHome />} />
-        <Route path="/products" element={<ProtectedProducts />} />
-        <Route path="/callback" element={<Callback />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+    <AppTheme {...props} themeComponents={xThemeComponents}>
+      <CssBaseline enableColorScheme />
+      <Box sx={{ display: "flex" }}>
+        <SideMenu />
+        <AppNavbar />
+        <Box
+          component="main"
+          sx={(theme) => ({
+            flexGrow: 1,
+            backgroundColor: alpha(theme.palette.background.default, 1),
+            overflow: "auto",
+          })}
+        >
+          <Header />
+          <Stack
+            spacing={2}
+            sx={{
+              alignItems: "center",
+              mx: 3,
+              pb: 5,
+              mt: { xs: 10, md: 2 },
+            }}
+          >
+            <AppRoutes />
+          </Stack>
+        </Box>
+      </Box>
+    </AppTheme>
   );
 }
