@@ -19,9 +19,9 @@ const columns: GridColDef[] = [
     flex: 1.0,
     minWidth: 100,
   },
-  { field: "givenName", headerName: "First Name", flex: 1.0, minWidth: 80 },
+  { field: "given_name", headerName: "First Name", flex: 1.0, minWidth: 80 },
   {
-    field: "familyName",
+    field: "family_name",
     headerName: "Last Name",
     flex: 1.0,
     minWidth: 80,
