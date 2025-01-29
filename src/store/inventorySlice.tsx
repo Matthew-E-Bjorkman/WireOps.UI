@@ -60,7 +60,7 @@ export const inventoryApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getItemList: builder.query<Item[], void>({
+    getItems: builder.query<Item[], void>({
       query: () => "/product",
       providesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
@@ -72,7 +72,7 @@ export const inventoryApi = createApi({
     getItemById: builder.query<Item, string>({
       query: (id) => `/product/${id}`,
     }),
-    addItem: builder.mutation<string, Partial<Item>>({
+    addItem: builder.mutation<Item, Partial<Item>>({
       query: (body) => ({
         url: "/product",
         method: "POST",
@@ -81,11 +81,11 @@ export const inventoryApi = createApi({
       invalidatesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(inventoryApi.endpoints.getItemList.initiate());
+          dispatch(inventoryApi.endpoints.getItems.initiate());
         });
       },
     }),
-    editItem: builder.mutation<boolean, Partial<Item>>({
+    editItem: builder.mutation<Item, Partial<Item>>({
       query: (body) => ({
         url: `/product/${body.id}`,
         method: "PUT",
@@ -94,7 +94,7 @@ export const inventoryApi = createApi({
       invalidatesTags: ["Item"],
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
-          dispatch(inventoryApi.endpoints.getItemList.initiate());
+          dispatch(inventoryApi.endpoints.getItems.initiate());
         });
       },
     }),
@@ -107,7 +107,7 @@ export const inventoryApi = createApi({
       onQueryStarted: (_, { dispatch, queryFulfilled }) => {
         queryFulfilled.then((result) => {
           dispatch(inventorySlice.actions.setSelectedItem(null));
-          dispatch(inventoryApi.endpoints.getItemList.initiate());
+          dispatch(inventoryApi.endpoints.getItems.initiate());
         });
       },
     }),
@@ -115,7 +115,7 @@ export const inventoryApi = createApi({
 });
 
 export const {
-  useGetItemListQuery,
+  useGetItemsQuery,
   useGetItemByIdQuery,
   useAddItemMutation,
   useEditItemMutation,

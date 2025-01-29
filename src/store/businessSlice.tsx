@@ -2,27 +2,26 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Company } from "../types/Business/Company";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit/react";
 import { AppRootState } from "./store";
-import {
-  Staffer,
-  StafferGetParams,
-  StafferLinkToUserRequest,
-  StafferRequest,
-} from "../types/Business/Staffer";
+import { Staffer, StafferGetParams } from "../types/Business/Staffer";
 
 interface BusinessState {
   company: Company | null;
+  isEditingCompany: boolean;
   staffers: Staffer[];
-  current_staffer: Staffer | null;
-  selected_staffer: Staffer | null;
-  is_new_staffer: boolean;
+  currentStaffer: Staffer | null;
+  selectedStaffer: Staffer | null;
+  isNewStaffer: boolean;
+  isEditingStaffer: boolean;
 }
 
 const initialState: BusinessState = {
   company: null,
+  isEditingCompany: false,
   staffers: [],
-  current_staffer: null,
-  selected_staffer: null,
-  is_new_staffer: false,
+  currentStaffer: null,
+  selectedStaffer: null,
+  isNewStaffer: false,
+  isEditingStaffer: false,
 };
 
 export const businessSlice = createSlice({
@@ -32,17 +31,23 @@ export const businessSlice = createSlice({
     setCompany: (state, action: PayloadAction<Company | null>) => {
       state.company = action.payload;
     },
+    setIsEditingCompany: (state, action: PayloadAction<boolean>) => {
+      state.isEditingCompany = action.payload;
+    },
     setStaffers: (state, action: PayloadAction<Staffer[]>) => {
       state.staffers = action.payload;
     },
     setCurrentStaffer: (state, action: PayloadAction<Staffer | null>) => {
-      state.current_staffer = action.payload;
+      state.currentStaffer = action.payload;
     },
     setSelectedStaffer: (state, action: PayloadAction<Staffer | null>) => {
-      state.selected_staffer = action.payload;
+      state.selectedStaffer = action.payload;
     },
     setIsNewStaffer: (state, action: PayloadAction<boolean>) => {
-      state.is_new_staffer = action.payload;
+      state.isNewStaffer = action.payload;
+    },
+    setIsEditingStaffer: (state, action: PayloadAction<boolean>) => {
+      state.isEditingStaffer = action.payload;
     },
   },
 });
@@ -103,22 +108,39 @@ export const businessApi = createApi({
     getStaffers: builder.query<Staffer[], string>({
       query: (company_id) => `company/${company_id}/staffer`,
       providesTags: ["Staffer"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: (company_id, { dispatch, getState, queryFulfilled }) => {
+        if (!company_id) {
+          // Executed via tag invalidation
+          company_id = (getState() as AppRootState).business.company!.id;
+        }
         queryFulfilled.then((result) => {
           dispatch(businessSlice.actions.setStaffers(result.data));
         });
       },
     }),
-    getStafferById: builder.query<Staffer, StafferGetParams>({
+    getStafferById: builder.query<Staffer, Partial<StafferGetParams>>({
       query: (body) => `/company/${body.company_id}/staffer/${body.id}`,
+      onQueryStarted: (request, { getState }) => {
+        if (!request.company_id) {
+          request.company_id = (
+            getState() as AppRootState
+          ).business.company!.id;
+        }
+      },
     }),
-    addStaffer: builder.mutation<Staffer, StafferRequest>({
+    addStaffer: builder.mutation<Staffer, Partial<Staffer>>({
       query: (body) => ({
         url: `/company/${body.company_id}/staffer`,
         method: "POST",
         body,
       }),
       invalidatesTags: ["Staffer"],
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
+        queryFulfilled.then((result) => {
+          dispatch(businessSlice.actions.setSelectedStaffer(result.data));
+        });
+      },
     }),
     editStaffer: builder.mutation<Staffer, Partial<Staffer>>({
       query: (body) => ({
@@ -127,44 +149,48 @@ export const businessApi = createApi({
         body,
       }),
       invalidatesTags: ["Staffer"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
         queryFulfilled.then((result) => {
           dispatch(businessSlice.actions.setSelectedStaffer(result.data));
         });
       },
     }),
-    deleteStaffer: builder.mutation<boolean, StafferGetParams>({
+    deleteStaffer: builder.mutation<boolean, Partial<StafferGetParams>>({
       query: (body) => ({
         url: `/company/${body.company_id}/staffer/${body.id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Staffer"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
         queryFulfilled.then((result) => {
           dispatch(businessSlice.actions.setSelectedStaffer(null));
         });
       },
     }),
-    linkStafferToUser: builder.mutation<Staffer, StafferLinkToUserRequest>({
+    linkStafferToUser: builder.mutation<Staffer, Partial<Staffer>>({
       query: (body) => ({
         url: `/company/${body.company_id}/staffer/${body.id}`,
         method: "POST",
         body,
       }),
       invalidatesTags: ["Staffer"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
         queryFulfilled.then((result) => {
           dispatch(businessSlice.actions.setSelectedStaffer(result.data));
         });
       },
     }),
-    inviteStaffer: builder.mutation<Staffer, StafferGetParams>({
+    inviteStaffer: builder.mutation<Staffer, Partial<StafferGetParams>>({
       query: (body) => ({
-        url: `/company/${body.company_id}/staffer/${body.id}`,
+        url: `/company/${body.company_id}/staffer/${body.id}/invite`,
         method: "POST",
       }),
       invalidatesTags: ["Staffer"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
         queryFulfilled.then((result) => {
           dispatch(businessSlice.actions.setSelectedStaffer(result.data));
         });
@@ -188,10 +214,12 @@ export const {
 
 export const {
   setCompany,
+  setIsEditingCompany,
   setStaffers,
   setCurrentStaffer,
   setSelectedStaffer,
   setIsNewStaffer,
+  setIsEditingStaffer,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;

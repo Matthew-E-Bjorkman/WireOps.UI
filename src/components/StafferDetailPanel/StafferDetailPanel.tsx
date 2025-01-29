@@ -9,36 +9,38 @@ import {
   Grid2,
 } from "@mui/material";
 import {
-  setIsEditingItem,
-  useDeleteItemMutation,
-} from "../../store/inventorySlice";
+  setIsEditingStaffer,
+  useDeleteStafferMutation,
+  useInviteStafferMutation,
+} from "../../store/businessSlice";
 import { AppRootState } from "../../store/store";
 import { useNavigate } from "react-router-dom";
 
-const ItemDetailPanel = () => {
+const StafferDetailPanel = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [deleteItem] = useDeleteItemMutation();
+  const [deleteStaffer] = useDeleteStafferMutation();
+  const [inviteStaffer] = useInviteStafferMutation();
 
-  const { selectedItem } = useSelector(
-    (state: AppRootState) => state.inventory
+  const { selectedStaffer, currentStaffer } = useSelector(
+    (state: AppRootState) => state.business
   );
 
   function handleDelete(): void {
-    deleteItem(selectedItem!.id).then(() => {
-      navigate("/items");
+    deleteStaffer({ id: selectedStaffer!.id }).then(() => {
+      navigate("/staffers");
     });
   }
 
   function handleEdit(): void {
-    dispatch(setIsEditingItem(true));
+    dispatch(setIsEditingStaffer(true));
   }
 
   return (
     <Paper elevation={3} sx={{ p: 3, margin: "auto" }}>
       <Typography variant="h5" component="h2" gutterBottom>
-        {selectedItem?.name}
+        {selectedStaffer?.given_name} {selectedStaffer?.family_name}
       </Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -52,13 +54,34 @@ const ItemDetailPanel = () => {
                 my: 0,
               }}
             >
-              Name
+              Email
             </InputLabel>
           </Grid2>
           <Grid2 size={{ xs: 12, sm: 10 }}>
             <TextField
-              name="name"
-              value={selectedItem?.name}
+              name="email"
+              value={selectedStaffer?.email}
+              variant="outlined"
+              disabled
+              fullWidth
+            />
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 2 }} sx={{ alignContent: "center" }}>
+            <InputLabel
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+                fontWeight: 700,
+                my: 0,
+              }}
+            >
+              First Name
+            </InputLabel>
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 10 }}>
+            <TextField
+              name="givenName"
+              value={selectedStaffer?.given_name}
               disabled
               fullWidth
               variant="outlined"
@@ -73,61 +96,56 @@ const ItemDetailPanel = () => {
                 my: 0,
               }}
             >
-              SKU
+              Last Name
             </InputLabel>
           </Grid2>
           <Grid2 size={{ xs: 12, sm: 10 }}>
             <TextField
-              name="sku"
-              value={selectedItem?.sku}
+              name="familyName"
+              value={selectedStaffer?.family_name}
               disabled
               fullWidth
               variant="outlined"
-            />
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 2 }}>
-            <InputLabel
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-                fontWeight: 700,
-                my: 0,
-              }}
-            >
-              Description
-            </InputLabel>
-          </Grid2>
-          <Grid2 size={{ xs: 12, sm: 10 }}>
-            <TextField
-              name="description"
-              value={selectedItem?.description || ""}
-              variant="outlined"
-              disabled
-              multiline
-              fullWidth
-              rows={4}
-              slotProps={{
-                input: {
-                  sx: {
-                    minHeight: "100px",
-                  },
-                },
-              }}
             />
           </Grid2>
         </Grid2>
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-          <Button variant="contained" color="error" onClick={handleDelete}>
-            Delete Item
-          </Button>
-          <Button type="submit" variant="contained" onClick={handleEdit}>
-            Edit Item
-          </Button>
-        </Box>
+        <Grid2
+          container
+          rowSpacing={2}
+          columnSpacing={2}
+          justifyContent="space-between"
+        >
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => inviteStaffer({ id: selectedStaffer!.id })}
+              disabled={selectedStaffer?.user_id !== null}
+            >
+              Invite
+            </Button>
+          </Box>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              disabled={
+                selectedStaffer?.is_owner ||
+                selectedStaffer?.id == currentStaffer?.id
+              }
+            >
+              Delete Staffer
+            </Button>
+            <Button type="submit" variant="contained" onClick={handleEdit}>
+              Edit Staffer
+            </Button>
+          </Box>
+        </Grid2>
       </Box>
     </Paper>
   );
 };
 
-export default ItemDetailPanel;
+export default StafferDetailPanel;

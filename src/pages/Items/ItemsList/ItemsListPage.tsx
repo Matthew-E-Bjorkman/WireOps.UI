@@ -1,4 +1,4 @@
-import { useGetItemListQuery } from "../../../store/inventorySlice";
+import { useGetItemsQuery } from "../../../store/inventorySlice";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { AppRootState } from "../../../store/store";
@@ -9,14 +9,14 @@ import Loading from "../../../components/Loading";
 
 const ItemsListPage = () => {
   const { items } = useSelector((state: AppRootState) => state.inventory);
-  useGetItemListQuery();
+  useGetItemsQuery();
 
   if (!items) {
     return <Loading />;
   }
 
   return (
-    <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+    <Box sx={{ width: "100%", maxWidth: { sm: "100%" } }}>
       <ItemListTableHeader />
       <ItemListTable itemsList={items} />
       <Copyright sx={{ my: 4 }} />

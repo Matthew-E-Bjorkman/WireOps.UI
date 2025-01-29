@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import AppRoutes from "../AppRoutes/AppRoutes";
 import { StafferGetParams } from "../../types/Business/Staffer";
-import {
-  GetTokenSilentlyOptions,
-  useAuth0,
-  withAuthenticationRequired,
-} from "@auth0/auth0-react";
+import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
 import Loading from "../Loading/Loading";
 import { useDispatch, useSelector } from "react-redux";
 import {

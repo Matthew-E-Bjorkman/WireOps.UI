@@ -13,9 +13,13 @@ import {
   useAddItemMutation,
   useEditItemMutation,
 } from "../../../store/inventorySlice";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { SerializedError } from "@reduxjs/toolkit";
+import { useNavigate } from "react-router-dom";
 
 const ItemsDetailPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, isEditingItem, isNewItem } = useSelector(
     (state: AppRootState) => state.inventory
   );
@@ -25,17 +29,37 @@ const ItemsDetailPage = () => {
 
   function onFormSubmit(item: Item): void {
     if (isNewItem) {
-      createItem(item);
+      createItem(item).then((result) =>
+        postFormSubmit(result.data, result.error)
+      );
     } else {
-      updateItem(item);
+      updateItem(item).then((result) =>
+        postFormSubmit(result.data, result.error)
+      );
     }
-    dispatch(setSelectedItem(item));
-    dispatch(setIsEditingItem(false));
-    dispatch(setIsNewItem(false));
+  }
+
+  function postFormSubmit(
+    item: Item | undefined,
+    error: FetchBaseQueryError | SerializedError | undefined
+  ): void {
+    if (item) {
+      const wasNewItem = isNewItem;
+      dispatch(setSelectedItem(item));
+      dispatch(setIsEditingItem(false));
+      dispatch(setIsNewItem(false));
+      if (wasNewItem) {
+        navigate(`/items/${item.id}`);
+      }
+    }
+
+    if (error) {
+      console.error(error);
+    }
   }
 
   return (
-    <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+    <Box sx={{ width: "100%", maxWidth: { sm: "100%" } }}>
       <Grid2
         container
         spacing={3}

@@ -14,31 +14,18 @@ const Loading: React.FC<LoadingProps> = ({
 }) => {
   return (
     <Box
-      sx={[
-        {
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        fullScreen && {
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: (theme) =>
-            theme.palette.mode === "light"
-              ? "rgba(255, 255, 255, 0.8)"
-              : "rgba(0, 0, 0, 0.8)",
-          zIndex: 9999,
-        },
-      ]}
+      height={fullScreen ? "100vh" : "100%"}
+      width={fullScreen ? "100vw" : "100%"}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
       <CircularProgress
-        size={80}
+        size={fullScreen ? 100 : "1rem"}
         color={color}
-        sx={{ mb: message ? 2 : 0 }}
         aria-label="Loading spinner"
       />
       {message && (
