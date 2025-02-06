@@ -9,13 +9,14 @@ import {
   setUserId,
   setTenantId,
 } from "../../store/identitySlice";
-import { setCurrentStaffer } from "../../store/businessSlice";
 import { AppRootState } from "../../store/store";
 import { CompanyRequest } from "../../types/Business/Company";
 import {
   useAddCompanyMutation,
   useGetCompanyByIdQuery,
+  useGetStaffersQuery,
   useGetStafferByIdQuery,
+  setCurrentStaffer,
 } from "../../store/businessSlice";
 
 import type {} from "@mui/x-date-pickers/themeAugmentation";
@@ -50,18 +51,26 @@ export default function App(props: { disableCustomTheme?: boolean }) {
   } = useAuth0();
   const { access_token } = useSelector((state: AppRootState) => state.identity);
   const { tenant_id } = useSelector((state: AppRootState) => state.identity);
-  const { staffers } = useSelector((state: AppRootState) => state.business);
 
   const [addCompany] = useAddCompanyMutation();
-  const { data: company } = useGetCompanyByIdQuery(tenant_id, {
-    skip: !tenant_id || !access_token,
-  });
+  const { data: company, isLoading: companyLoading } = useGetCompanyByIdQuery(
+    tenant_id,
+    {
+      skip: !tenant_id || !access_token,
+    }
+  );
+  const { data: staffers, isLoading: staffersLoading } = useGetStaffersQuery(
+    tenant_id,
+    {
+      skip: companyLoading,
+    }
+  );
   const { data: staffer } = useGetStafferByIdQuery(
     {
-      company_id: company?.id,
-      id: staffers.find((s) => s.user_id === user?.sub)?.id,
+      company_id: tenant_id,
+      id: staffers?.find((s) => s.user_id === user?.sub)?.id,
     } as StafferGetParams,
-    { skip: !company || staffers.length === 0 }
+    { skip: staffersLoading }
   );
 
   if (access_token === "") {
@@ -91,22 +100,21 @@ export default function App(props: { disableCustomTheme?: boolean }) {
               return;
             }
 
-            dispatch(setTenantId(result.data!.id));
-
             //Reset the token since we have a new company
             getAccessTokenSilently({
               cacheMode: "off",
             }).then((token) => {
               dispatch(setAccessToken(token));
+              dispatch(setTenantId(result.data!.id));
             });
           });
         } else if (userDetails && userDetails.tenant_id) {
-          dispatch(setTenantId(userDetails.tenant_id));
           //Reset the token since we have a company
           getAccessTokenSilently({
             cacheMode: "off",
           }).then((token) => {
             dispatch(setAccessToken(token));
+            dispatch(setTenantId(userDetails.tenant_id));
           });
         }
       });

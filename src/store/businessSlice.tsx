@@ -84,12 +84,6 @@ export const businessApi = createApi({
         body,
       }),
       invalidatesTags: ["Company"],
-      onQueryStarted: (_, { dispatch, queryFulfilled }) => {
-        queryFulfilled.then((result) => {
-          dispatch(businessSlice.actions.setCompany(result.data));
-          dispatch(businessApi.endpoints.getStaffers.initiate(result.data.id));
-        });
-      },
     }),
     editCompany: builder.mutation<Company, Partial<Company>>({
       query: (body) => ({

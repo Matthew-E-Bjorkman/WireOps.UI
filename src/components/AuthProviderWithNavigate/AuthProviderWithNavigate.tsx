@@ -31,7 +31,6 @@ export const Auth0ProviderWithNavigate: React.FC<
       authorizationParams={{
         audience: audience,
         redirect_uri: redirectUri,
-        scope: "admin profile email",
       }}
       onRedirectCallback={onRedirectCallback}
     >
