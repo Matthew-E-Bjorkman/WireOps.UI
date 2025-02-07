@@ -6,6 +6,7 @@ export interface Staffer {
   given_name: string;
   family_name: string;
   is_owner: boolean;
+  role_id: string;
 }
 
 export interface StafferGetParams {

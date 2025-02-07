@@ -8,7 +8,13 @@ import {
   Paper,
   Typography,
   Grid2,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
+import { Role } from "../../types/Business/Role";
+import { useSelector } from "react-redux";
+import { AppRootState } from "../../store/store";
 
 interface StafferEditPanelProps {
   selectedStaffer: Staffer;
@@ -22,22 +28,20 @@ const StafferEditPanel = ({
   onSubmit,
 }: StafferEditPanelProps) => {
   const [formData, setFormData] = useState<Staffer>({
-    given_name: "",
-    family_name: "",
-    email: "",
+    given_name: selectedStaffer.given_name,
+    family_name: selectedStaffer.family_name,
+    email: selectedStaffer.email,
+    role_id: selectedStaffer.role_id,
   } as Staffer);
 
   const [touched, setTouched] = useState<Record<keyof Staffer, boolean>>({
     given_name: false,
     family_name: false,
     email: false,
+    role_id: false,
   } as Record<keyof Staffer, boolean>);
 
-  useEffect(() => {
-    if (selectedStaffer) {
-      setFormData(selectedStaffer);
-    }
-  }, [selectedStaffer]);
+  const { roles } = useSelector((state: AppRootState) => state.business);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,6 +52,18 @@ const StafferEditPanel = ({
     setTouched((prev) => ({
       ...prev,
       [name]: true,
+    }));
+  };
+
+  const handleRoleChange = (e: SelectChangeEvent<string>) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      role_id: value,
+    }));
+    setTouched((prev) => ({
+      ...prev,
+      role_id: true,
     }));
   };
 
@@ -158,6 +174,32 @@ const StafferEditPanel = ({
                 variant="outlined"
                 size="small"
               />
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 2 }} sx={{ alignContent: "center" }}>
+              <InputLabel
+                sx={{
+                  display: "flex",
+                  justifyContent: "end",
+                  fontWeight: 700,
+                  my: 0,
+                }}
+              >
+                Role
+              </InputLabel>
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 10 }}>
+              <Select
+                disabled={selectedStaffer?.is_owner}
+                name="role"
+                value={formData.role_id}
+                onChange={handleRoleChange}
+                fullWidth
+                variant="outlined"
+              >
+                {roles?.map((role: Role) => (
+                  <MenuItem value={role.id}>{role.name}</MenuItem>
+                ))}
+              </Select>
             </Grid2>
           </Grid2>
 

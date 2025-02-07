@@ -7,14 +7,18 @@ import {
   Paper,
   Typography,
   Grid2,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   setIsEditingStaffer,
   useDeleteStafferMutation,
+  useGetRolesQuery,
   useInviteStafferMutation,
 } from "../../store/businessSlice";
 import { AppRootState } from "../../store/store";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Loading";
 
 const StafferDetailPanel = () => {
   const dispatch = useDispatch();
@@ -23,7 +27,7 @@ const StafferDetailPanel = () => {
   const [deleteStaffer] = useDeleteStafferMutation();
   const [inviteStaffer] = useInviteStafferMutation();
 
-  const { selectedStaffer, currentStaffer } = useSelector(
+  const { selectedStaffer, currentStaffer, company, roles } = useSelector(
     (state: AppRootState) => state.business
   );
 
@@ -36,6 +40,8 @@ const StafferDetailPanel = () => {
   function handleEdit(): void {
     dispatch(setIsEditingStaffer(true));
   }
+
+  if (!selectedStaffer) return <Loading />;
 
   return (
     <Paper elevation={3} sx={{ p: 3, margin: "auto" }}>
@@ -107,6 +113,31 @@ const StafferDetailPanel = () => {
               fullWidth
               variant="outlined"
             />
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 2 }} sx={{ alignContent: "center" }}>
+            <InputLabel
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+                fontWeight: 700,
+                my: 0,
+              }}
+            >
+              Role
+            </InputLabel>
+          </Grid2>
+          <Grid2 size={{ xs: 12, sm: 10 }}>
+            <Select
+              name="role"
+              value={selectedStaffer?.role_id}
+              disabled
+              fullWidth
+              variant="outlined"
+            >
+              {roles?.map((role) => (
+                <MenuItem value={role.id}>{role.name}</MenuItem>
+              ))}
+            </Select>
           </Grid2>
         </Grid2>
 

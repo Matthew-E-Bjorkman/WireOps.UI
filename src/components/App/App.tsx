@@ -53,12 +53,9 @@ export default function App(props: { disableCustomTheme?: boolean }) {
   const { tenant_id } = useSelector((state: AppRootState) => state.identity);
 
   const [addCompany] = useAddCompanyMutation();
-  const { data: company, isLoading: companyLoading } = useGetCompanyByIdQuery(
-    tenant_id,
-    {
-      skip: !tenant_id || !access_token,
-    }
-  );
+  const { isLoading: companyLoading } = useGetCompanyByIdQuery(tenant_id, {
+    skip: !tenant_id || !access_token,
+  });
   const { data: staffers, isLoading: staffersLoading } = useGetStaffersQuery(
     tenant_id,
     {
@@ -70,7 +67,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
       company_id: tenant_id,
       id: staffers?.find((s) => s.user_id === user?.sub)?.id,
     } as StafferGetParams,
-    { skip: staffersLoading }
+    { skip: staffersLoading || !staffers }
   );
 
   if (access_token === "") {
@@ -119,7 +116,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
         }
       });
     }
-  }, [access_token, userLoading]);
+  }, [userLoading]);
 
   useEffect(() => {
     if (staffer) {

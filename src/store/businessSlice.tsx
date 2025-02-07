@@ -3,10 +3,15 @@ import type { Company } from "../types/Business/Company";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit/react";
 import { AppRootState } from "./store";
 import { Staffer, StafferGetParams } from "../types/Business/Staffer";
+import { Role, RoleGetParams } from "../types/Business/Role";
 
 interface BusinessState {
   company: Company | null;
   isEditingCompany: boolean;
+  roles: Role[];
+  selectedRole: Role | null;
+  isNewRole: boolean;
+  isEditingRole: boolean;
   staffers: Staffer[];
   currentStaffer: Staffer | null;
   selectedStaffer: Staffer | null;
@@ -17,6 +22,10 @@ interface BusinessState {
 const initialState: BusinessState = {
   company: null,
   isEditingCompany: false,
+  roles: [],
+  selectedRole: null,
+  isNewRole: false,
+  isEditingRole: false,
   staffers: [],
   currentStaffer: null,
   selectedStaffer: null,
@@ -33,6 +42,18 @@ export const businessSlice = createSlice({
     },
     setIsEditingCompany: (state, action: PayloadAction<boolean>) => {
       state.isEditingCompany = action.payload;
+    },
+    setRoles: (state, action: PayloadAction<Role[]>) => {
+      state.roles = action.payload;
+    },
+    setSelectedRole: (state, action: PayloadAction<Role | null>) => {
+      state.selectedRole = action.payload;
+    },
+    setIsNewRole: (state, action: PayloadAction<boolean>) => {
+      state.isNewRole = action.payload;
+    },
+    setIsEditingRole: (state, action: PayloadAction<boolean>) => {
+      state.isEditingRole = action.payload;
     },
     setStaffers: (state, action: PayloadAction<Staffer[]>) => {
       state.staffers = action.payload;
@@ -54,7 +75,7 @@ export const businessSlice = createSlice({
 
 export const businessApi = createApi({
   reducerPath: "businessApi",
-  tagTypes: ["Company", "Staffer"],
+  tagTypes: ["Company", "Role", "Staffer"],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_BUSINESS_API_SERVER_URL,
     prepareHeaders: async (headers, { getState }) => {
@@ -98,13 +119,74 @@ export const businessApi = createApi({
         });
       },
     }),
+    //Role endpoints
+    getRoles: builder.query<Role[], string>({
+      query: (company_id) => `company/${company_id}/role`,
+      providesTags: ["Role"],
+      onQueryStarted: (company_id, { dispatch, getState, queryFulfilled }) => {
+        company_id = (getState() as AppRootState).business.company!.id;
+        queryFulfilled.then((result) => {
+          dispatch(businessSlice.actions.setRoles(result.data));
+        });
+      },
+    }),
+    getRoleById: builder.query<Role, Partial<RoleGetParams>>({
+      query: (body) => `company/${body.company_id}/role/${body.id}`,
+      onQueryStarted: (request, { getState }) => {
+        if (!request.company_id) {
+          request.company_id = (
+            getState() as AppRootState
+          ).business.company!.id;
+        }
+      },
+    }),
+    addRole: builder.mutation<Role, Partial<Role>>({
+      query: (body) => ({
+        url: `/company/${body.company_id}/role`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Role"],
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
+        queryFulfilled.then((result) => {
+          dispatch(businessSlice.actions.setSelectedRole(result.data));
+        });
+      },
+    }),
+    editRole: builder.mutation<Role, Partial<Role>>({
+      query: (body) => ({
+        url: `/company/${body.company_id}/role/${body.id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Role"],
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
+        queryFulfilled.then((result) => {
+          dispatch(businessSlice.actions.setSelectedRole(result.data));
+        });
+      },
+    }),
+    deleteRole: builder.mutation<boolean, Partial<RoleGetParams>>({
+      query: (body) => ({
+        url: `/company/${body.company_id}/role/${body.id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Role"],
+      onQueryStarted: (request, { dispatch, getState, queryFulfilled }) => {
+        request.company_id = (getState() as AppRootState).business.company!.id;
+        queryFulfilled.then((result) => {
+          dispatch(businessSlice.actions.setSelectedRole(null));
+        });
+      },
+    }),
     //Staffer endpoints
     getStaffers: builder.query<Staffer[], string>({
       query: (company_id) => `company/${company_id}/staffer`,
       providesTags: ["Staffer"],
       onQueryStarted: (company_id, { dispatch, getState, queryFulfilled }) => {
         if (!company_id) {
-          // Executed via tag invalidation
           company_id = (getState() as AppRootState).business.company!.id;
         }
         queryFulfilled.then((result) => {
@@ -197,6 +279,11 @@ export const {
   useGetCompanyByIdQuery,
   useAddCompanyMutation,
   useEditCompanyMutation,
+  useGetRolesQuery,
+  useGetRoleByIdQuery,
+  useAddRoleMutation,
+  useEditRoleMutation,
+  useDeleteRoleMutation,
   useGetStaffersQuery,
   useGetStafferByIdQuery,
   useAddStafferMutation,
@@ -209,6 +296,10 @@ export const {
 export const {
   setCompany,
   setIsEditingCompany,
+  setRoles,
+  setSelectedRole,
+  setIsNewRole,
+  setIsEditingRole,
   setStaffers,
   setCurrentStaffer,
   setSelectedStaffer,

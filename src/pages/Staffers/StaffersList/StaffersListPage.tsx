@@ -1,4 +1,7 @@
-import { useGetStaffersQuery } from "../../../store/businessSlice";
+import {
+  useGetStaffersQuery,
+  useGetRolesQuery,
+} from "../../../store/businessSlice";
 import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { AppRootState } from "../../../store/store";
@@ -12,6 +15,7 @@ const StaffersListPage = () => {
     (state: AppRootState) => state.business
   );
   useGetStaffersQuery(company?.id || "", { skip: !company });
+  useGetRolesQuery(company?.id || "", { skip: !company });
 
   if (!company || !staffers) {
     return <Loading />;
